@@ -3,7 +3,7 @@ import logo from '/logo.png';
 const Navbar = () => {
   return (
     <header className="h-16 shadow-sm">
-      <nav>
+      <nav className='flex'>
         <a href="/">
           <img src={logo} alt="logo"/>
           {/* Nav Items */}

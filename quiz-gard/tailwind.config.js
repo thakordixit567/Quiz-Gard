@@ -1,15 +1,12 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ["./dist/**/*.{html,js}", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
-      colors:{
-        'primary': '#FCC822'
-      }
+      colors: {
+        primary: "#FCC822",
+      },
     },
   },
-  plugins: [],
+  plugins: [require("tailwindcss"), require("autoprefixer")],
 };
