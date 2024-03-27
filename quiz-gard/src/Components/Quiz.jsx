@@ -1,5 +1,22 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import Quizheader from "./Quizheader";
+
+const Loading = () => (
+  <div className="h-[220px] w-[220px] mx-auto mt-8 flex flex-col justify-center items-center border-2 rounded-tr-[50%] rounded-bl-[50%]">
+    <p className="text-xl text-gray-500">Loading...</p>
+  </div>
+);
+
+const formatTime = (seconds) => {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  const formattedTime = `${String(minutes).padStart(2, "0")}:${String(remainingSeconds).padStart(2, "0")}`;
+  return formattedTime;
+};
+
+
 
 const Quiz = () => {
   const [question, setQuestion] = useState([]);
@@ -10,6 +27,7 @@ const Quiz = () => {
   const [timer, setTimer] = useState(60);
   const [timeIntervalId, settimeIntervalId] = useState("");
   const [status, setstatus] = useState("");
+  const Navigate = useNavigate();
 
   useEffect(() => {
     fetch("/quiz.json")
@@ -47,7 +65,8 @@ const Quiz = () => {
     setTimeout(()=> {
       const quizScore = calculateScore(answer);
       setScore(quizScore);
-      const percentage = (quizScore /question.length);
+      const percentage = (quizScore /question.length) * 100;
+      console.log(percentage);
       const newStatus = percentage >= 50 ? "Passed" : "Failed";
       setstatus(newStatus);
       setshowResult(true);
@@ -65,8 +84,20 @@ const Quiz = () => {
     }
     return score;
   }
+
+    //Restart Quiz Button
+    const restartQuiz = () => {
+      setAnswer({});
+      setScore(0);
+      setshowResult(false);
+      setLoading(false);
+      setTimer(60);
+      Navigate("/quiz")
+    }
+    
   return (
     <section>
+    <Quizheader timer={timer}/>
       <div className="md:w-9/12 w-[90%] mx-auto mb-8 flex flex-col sm:flex-row justify-between items-start">
         <div className="md:w-[70%] w-full">
           {question.map((question, index) => (
@@ -92,10 +123,10 @@ const Quiz = () => {
                     onClick={() => handleAnswerSelect(question.id, option)}
                     key={index}
                     className={`
-                        border p-2 border-gray-200 rounded text-sx cursor-pointer
+                        border p-2 border-gray-200 rounded text-sx  cursor-pointer
                         ${
                           answer[question.id] === option
-                            ? "border-gray-700"
+                            ? "bg-gray-300"
                             : ""
                         }`}
                   >
@@ -120,12 +151,31 @@ const Quiz = () => {
           {showresult && (
             <div>
               <h3 className="text-2xl font-medium">Your Score:</h3>
-              <div>
-                <h3 className={`text-xs ${status === "Passes" ? "text-green-800" : "text-red-500"}`}>{status}</h3>
+              <div className="h-[220px] w-[220px] mx-auto mt-8 flex flex-col justify-center
+              items-center border-2 rounded-tr-[50%] rounded-bl-[50%]">
+                <h3 className={`text-xl ${status === "Passed" ? "text-green-500" : "text-red-500"}`}>
+                {status}
+                </h3>
+                <h1 className="text-3xl font-bold my-2">{score * 10} 
+                <span className="text-slate-800">/60</span>
+                </h1>
+                <p>Total Time:
+                
+                <span>
+                 {formatTime(60 - timer)}
+                 </span>
+                <span> sec..</span>
+                </p>
               </div>
+              <button onClick={restartQuiz} className="bg-primary px-6 py-2 text-white rounded mt-8 w-full">
+              Restart
+              </button>
             </div>
           )}
+          
+          {loading && <Loading/>}
         </div>
+        
       </div>
     </section>
   );
