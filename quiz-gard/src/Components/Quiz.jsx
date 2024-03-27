@@ -9,6 +9,7 @@ const Quiz = () => {
   const [loading, setLoading] = useState(false);
   const [timer, setTimer] = useState(60);
   const [timeIntervalId, settimeIntervalId] = useState("");
+  const [status, setstatus] = useState("");
 
   useEffect(() => {
     fetch("/quiz.json")
@@ -17,7 +18,7 @@ const Quiz = () => {
         //console.log(data)
         setQuestion(data);
       });
-    const intervalId = setinterval(() => {
+    const intervalId = setInterval(() => {
       setTimer((prevTimer) => prevTimer - 1);
     }, 1000);
 
@@ -47,7 +48,10 @@ const Quiz = () => {
       const quizScore = calculateScore(answer);
       setScore(quizScore);
       const percentage = (quizScore /question.length);
-      const newStatus = 
+      const newStatus = percentage >= 50 ? "Passed" : "Failed";
+      setstatus(newStatus);
+      setshowResult(true);
+      setLoading(false);
     },5000)
   };
 
@@ -63,7 +67,7 @@ const Quiz = () => {
   }
   return (
     <section>
-      <div className="md:w-9/12 w-[90%] mx-auto mb-8">
+      <div className="md:w-9/12 w-[90%] mx-auto mb-8 flex flex-col sm:flex-row justify-between items-start">
         <div className="md:w-[70%] w-full">
           {question.map((question, index) => (
             <div
@@ -91,7 +95,7 @@ const Quiz = () => {
                         border p-2 border-gray-200 rounded text-sx cursor-pointer
                         ${
                           answer[question.id] === option
-                            ? "border-gray-300"
+                            ? "border-gray-700"
                             : ""
                         }`}
                   >
@@ -116,6 +120,9 @@ const Quiz = () => {
           {showresult && (
             <div>
               <h3 className="text-2xl font-medium">Your Score:</h3>
+              <div>
+                <h3 className={`text-xs ${status === "Passes" ? "text-green-800" : "text-red-500"}`}>{status}</h3>
+              </div>
             </div>
           )}
         </div>
