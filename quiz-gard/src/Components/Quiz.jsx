@@ -8,7 +8,7 @@ const Quiz = () => {
   const [score, setScore] = useState(0);
   const [loading, setLoading] = useState(false);
   const [timer, setTimer] = useState(60);
-  const [timeIntervalId, settimeIntervalId] = useState('');
+  const [timeIntervalId, settimeIntervalId] = useState("");
 
   useEffect(() => {
     fetch("/quiz.json")
@@ -24,8 +24,11 @@ const Quiz = () => {
     settimeIntervalId(intervalId);
     return () => {
       clearInterval(intervalId);
-    }
-  }, []);
+      if (timer === 0) {
+        alert("Time Is Out!");
+      }
+    };
+  }, [timer]);
 
   const handleAnswerSelect = (questionId, selectedOption) => {
     //console.log(selectedOption);
@@ -37,7 +40,27 @@ const Quiz = () => {
   const handleSubmit = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     setLoading(true);
+
+    clearInterval(timeIntervalId);
+
+    setTimeout(()=> {
+      const quizScore = calculateScore(answer);
+      setScore(quizScore);
+      const percentage = (quizScore /question.length);
+      const newStatus = 
+    },5000)
   };
+
+  const calculateScore = (userAnswers) => {
+    const correctAnswers = question.map((question) => question.answer);
+    let score = 0;
+    for (const questionId in userAnswers) {
+      if(userAnswers[questionId] === correctAnswers[questionId - 1]){
+        score++;
+      }
+    }
+    return score;
+  }
   return (
     <section>
       <div className="md:w-9/12 w-[90%] mx-auto mb-8">
